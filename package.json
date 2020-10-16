@@ -1,0 +1,28 @@
+{
+  "name": "visual-glossary",
+  "version": "1.0.0",
+  "description": "A visual glossary of theguardian.com",
+  "main": "index.js",
+  "scripts": {
+    "build": "node -r esm scripts/generatePage",
+    "start": "simple-file-watch --extension='js,json,liquid' --path='.' --command='yarn build' --silence"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/guardian/visual-glossary.git"
+  },
+  "author": "Gareth Trufitt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/guardian/visual-glossary/issues"
+  },
+  "homepage": "https://github.com/guardian/visual-glossary#readme",
+  "dependencies": {
+    "prettier": "^2.1.2",
+    "simple-file-watch": "^2.0.1"
+  },
+  "devDependencies": {
+    "esm": "^3.2.25",
+    "liquidjs": "^9.16.1"
+  }
+}

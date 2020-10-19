@@ -48,40 +48,49 @@ const getPage = async (pageObj) => {
 		return c;
 	})();
 
-	// 1.75 Scroll the page to load everything and then scroll to the top for screen 1
-	await autoScroll(page);
-	await page.evaluate(async () => {
-		window.scrollTo(0, 0);
-	});
+	// Accessing the file will throw an error if it doesn't exist
+	// so we use try catch to decide to take our screenshots
+	// Otherwise we skip screenshotting
+	try {
+		console.log(`Checking whether ./dist/img/${key}-1.png exists`);
+		fsBase.accessSync(`./dist/img/${key}-1.png`);
+	} catch (err) {
+		console.log("Screenshot doesn't exist for page, take it away");
+		// 1.75 Scroll the page to load everything and then scroll to the top for screen 1
+		await autoScroll(page);
+		await page.evaluate(async () => {
+			window.scrollTo(0, 0);
+		});
 
-	// 2. Take a screenshot and write it to dist
-	console.log('Taking a screenshot');
-	await fullPageScreenshot(page, {
-		path: `./dist/img/${key}-1.png`,
-	});
+		// 2. Take a screenshot and write it to dist
+		console.log('Taking a screenshot');
+		await fullPageScreenshot(page, {
+			path: `./dist/img/${key}-1.png`,
+		});
 
-	// Do it all again
-	await page.goto(rootPath2 + '/' + pageObj.path, {
-		waitUntil: 'networkidle0',
-		timeout: 60000,
-	});
+		// Do it all again
+		await page.goto(rootPath2 + '/' + pageObj.path, {
+			waitUntil: 'networkidle0',
+			timeout: 60000,
+		});
 
-	// Close consent
-	await page.addStyleTag({
-		content:
-			'[id*="sp_message_container"],.site-message--banner{display: none !important}',
-	});
+		// Close consent
+		await page.addStyleTag({
+			content:
+				'[id*="sp_message_container"],.site-message--banner{display: none !important}',
+		});
 
-	await autoScroll(page);
-	await page.evaluate(async () => {
-		window.scrollTo(0, 0);
-	});
+		await autoScroll(page);
+		await page.evaluate(async () => {
+			window.scrollTo(0, 0);
+		});
 
-	// 2. Take a screenshot and write it to dist
-	console.log('Taking a screenshot');
-	await fullPageScreenshot(page, {
-		path: `./dist/img/${key}-2.png`,
-	});
+		// 2. Take a screenshot and write it to dist
+		console.log('Taking a screenshot');
+		await fullPageScreenshot(page, {
+			path: `./dist/img/${key}-2.png`,
+		});
+	}
 
 	// 3. Build up the json
 
@@ -109,17 +118,11 @@ const getPage = async (pageObj) => {
 
 const init = async () => {
 	// 0. Setup dist folder
-	await new Promise((resolve, reject) => {
-		empty('./dist', false, (o) => {
-			if (o.error) {
-				console.error(o.error);
-				reject();
-			}
-			resolve();
-		});
-	});
-
-	await fs.mkdir('./dist/img');
+	try {
+		console.log(`Check if img path exists`);
+		fsBase.accessSync(`./dist/img`);
+		await fs.mkdir('./dist/img');
+	} catch (err) {}
 
 	// 1. Get the paths json
 	const pathsFile = await fs.readFile('./data/paths.json');

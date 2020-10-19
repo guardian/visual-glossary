@@ -20,6 +20,8 @@
   "homepage": "https://github.com/guardian/visual-glossary#readme",
   "dependencies": {
     "empty-folder": "^2.0.4",
+    "p-map": "^4.0.0",
+    "p-queue": "^6.6.2",
     "prettier": "^2.1.2",
     "puppeteer": "^5.3.1",
     "puppeteer-full-page-screenshot": "^1.0.5",

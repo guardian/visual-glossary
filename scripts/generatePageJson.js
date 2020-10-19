@@ -1,6 +1,6 @@
 import * as fsBase from 'fs';
 const fs = fsBase.promises;
-import empty from 'empty-folder';
+import pMap from 'p-map';
 import puppeteer from 'puppeteer';
 import fullPageScreenshot from 'puppeteer-full-page-screenshot';
 import { autoScroll } from './autoScroll';
@@ -42,7 +42,9 @@ const getPage = async (pageObj) => {
 	);
 
 	const key = (() => {
-		const a = headline.toLowerCase(); // Lowercase
+		const a =
+			(headline && headline.toLowerCase()) ||
+			'No h1 in this article - ' + Math.random(); // Lowercase
 		const b = a.replace(/[.,\/#!?$%\^&\*;:{}=\-_`~()]/g, ''); // Remove punctation
 		const c = b.replace(/ +?/g, ''); // Remove all spaces
 		return c;
@@ -128,10 +130,9 @@ const init = async () => {
 	const pathsFile = await fs.readFile('./data/paths.json');
 
 	const paths = JSON.parse(pathsFile);
-	console.log(paths);
 
 	// 2. Loop over paths json and build page.json
-	const pagesJson = await Promise.all(paths.map(getPage));
+	const pagesJson = await pMap(paths, getPage, { concurrency: 6 });
 
 	// 3. Create the json with the defaults
 	const json = {
